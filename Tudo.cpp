@@ -178,10 +178,8 @@ std::vector<int> generateReverseOrderedVector(int size) {
 
 
 int main() {
-   
-    std::vector<int> vector_sizes = {100, 1000, 5000, 10000, 20000};
+    std::vector<int> vector_sizes = {100, 1000, 5000};
     
-  
     std::map<std::string, std::function<void(std::vector<int>&, Metrics&)>> algorithms;
     algorithms["Bubble Sort"] = bubbleSort;
     algorithms["Insertion Sort"] = insertionSort;
@@ -189,64 +187,67 @@ int main() {
     algorithms["Merge Sort"] = mergeSort;
     algorithms["Quick Sort"] = quickSort;
 
-   
-    std::cout << "Algorithm,VectorType,Size,Time_ms,Comparisons,Swaps" << std::endl;
-
     for (int size : vector_sizes) {
+        std::cout << "\n==============================\n";
+        std::cout << "Tamanho do vetor: " << size << "\n";
+        std::cout << "==============================\n";
+
         for (int type_idx = 0; type_idx < 3; ++type_idx) {
             std::string type_name;
             std::vector<int> base_vector;
 
             switch (type_idx) {
                 case 0:
-                    type_name = "Random";
+                    type_name = "Aleatório";
                     base_vector = generateRandomVector(size);
                     break;
                 case 1:
-                    type_name = "Nearly Sorted";
+                    type_name = "Quase Ordenado";
                     base_vector = generateNearlySortedVector(size);
                     break;
                 case 2:
-                    type_name = "Reverse Ordered";
+                    type_name = "Reverso";
                     base_vector = generateReverseOrderedVector(size);
                     break;
             }
 
-           
+            std::cout << "\n--- Tipo de vetor: " << type_name << " ---\n";
+
             for (auto const& pair : algorithms) {
                 std::string name = pair.first;
                 auto func = pair.second;
 
                 
-                if ((name == "Bubble Sort" || name == "Selection Sort" || name == "Insertion Sort") && size > 10000) {
+                if ((name == "Bubble Sort" || name == "Selection Sort" || name == "Insertion Sort") && size > 10000)
                     continue;
-                }
 
                 std::vector<int> to_sort = base_vector;
                 Metrics m = {0, 0, 0.0};
-                
+
                 auto start = std::chrono::high_resolution_clock::now();
                 func(to_sort, m);
                 auto end = std::chrono::high_resolution_clock::now();
-                
                 std::chrono::duration<double, std::milli> duration = end - start;
                 m.time_ms = duration.count();
-                
-                std::cout << name << "," << type_name << "," << size << "," 
-                          << m.time_ms << "," << m.comparisons << "," << m.swaps << std::endl;
+
+                std::cout << "\n=== " << name << " ===\n";
+                std::cout << "Tempo de execução: " << m.time_ms << " ms\n";
+                std::cout << "Comparações: " << m.comparisons << "\n";
+                std::cout << "Trocas: " << m.swaps << "\n";
             }
 
             
             std::vector<int> to_sort_std = base_vector;
-            Metrics m_std = {0, 0, 0.0}; 
             auto start_std = std::chrono::high_resolution_clock::now();
             std::sort(to_sort_std.begin(), to_sort_std.end());
             auto end_std = std::chrono::high_resolution_clock::now();
             std::chrono::duration<double, std::milli> duration_std = end_std - start_std;
-            m_std.time_ms = duration_std.count();
 
-            std::cout << "std::sort" << "," << type_name << "," << size << "," 
-                      << m_std.time_ms << ",N/A,N/A" << std::endl;
+            std::cout << "\n=== std::sort (referência) ===\n";
+            std::cout << "Tempo de execução: " << duration_std.count() << " ms\n";
+            std::cout << "Comparações: N/A\n";
+            std::cout << "Trocas: N/A\n";
+            std::cout << "===============================\n";
         }
     }
 
